@@ -13,6 +13,19 @@ namespace PokemonReviewWeb.Repository
             _context = context;
         }
 
+        public bool CreateReview(Review review)
+        {
+            //throw new NotImplementedException();
+            _context.Add(review);
+            return Save();
+        }
+
+        public bool DeleteReview(Review review)
+        {
+            _context.Remove(review);
+            return Save();
+        }
+
         public Review GetReview(int id)
         {
             return _context.Reviews.Where(r => r.Id == id).FirstOrDefault();
@@ -31,6 +44,18 @@ namespace PokemonReviewWeb.Repository
         public bool ReviewExist(int id)
         {
             return _context.Reviews.Any(r => r.Id==id);
+        }
+
+        public bool Save()
+        {
+            var review = _context.SaveChanges();
+            return review > 0 ? true : false;
+        }
+
+        public bool UpdateReview(Review review)
+        {
+            _context.Update(review);
+            return Save();
         }
     }
 }

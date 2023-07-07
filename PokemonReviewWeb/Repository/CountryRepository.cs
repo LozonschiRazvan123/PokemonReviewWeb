@@ -20,6 +20,19 @@ namespace PokemonReviewWeb.Repository
             return _context.Countries.Any(c=>c.Id==id);
         }
 
+        public bool CreateCountry(Country country)
+        {
+            //throw new NotImplementedException();
+            _context.Add(country);
+            return Save();
+        }
+
+        public bool DeleteCountry(Country country)
+        {
+            _context.Remove(country);
+            return Save();
+        }
+
         public ICollection<Country> GetCountries()
         {
             return _context.Countries.OrderBy(c=>c.Id).ToList();
@@ -38,6 +51,18 @@ namespace PokemonReviewWeb.Repository
         public ICollection<Owner> GetOwnersByACountry(int countryId)
         {
             return _context.Owners.Where(c=>c.Country.Id==countryId).ToList();
+        }
+
+        public bool Save()
+        {
+            var country = _context.SaveChanges();
+            return country > 0 ? true : false;
+        }
+
+        public bool UpdateCountry(Country country)
+        {
+            _context.Update(country);
+            return Save();
         }
     }
 }

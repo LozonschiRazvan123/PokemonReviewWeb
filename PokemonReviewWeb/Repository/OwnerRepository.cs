@@ -12,6 +12,19 @@ namespace PokemonReviewWeb.Repository
             _context = context;
         }
 
+        public bool CreateOwner(Owner owner)
+        {
+            //throw new NotImplementedException();
+            _context.Add(owner);
+            return Save();
+        }
+
+        public bool DeleteOwner(Owner owner)
+        {
+            _context.Remove(owner);
+            return Save();
+        }
+
         public Owner GetOwner(Guid ownerId)
         {
             return _context.Owners.Find(ownerId);
@@ -36,6 +49,19 @@ namespace PokemonReviewWeb.Repository
         public bool OwnerExist(Guid ownerId)
         {
             return _context.Owners.Any(s => s.Id == ownerId);
+        }
+
+        public bool Save()
+        {
+            var owner = _context.SaveChanges();
+            return owner > 0 ? true : false;
+        }
+
+        public bool UpdateOwner(Owner owner)
+        {
+            //throw new NotImplementedException();
+            _context.Update(owner);
+            return Save();
         }
     }
 }

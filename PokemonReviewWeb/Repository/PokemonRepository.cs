@@ -13,6 +13,19 @@ namespace PokemonReviewWeb.Repository
 
         }
 
+        public bool CreatePokemon(Pokemon pokemon)
+        {
+            //throw new NotImplementedException();
+            _context.Add(pokemon);
+            return Save();
+        }
+
+        public bool DeletePokemon(Pokemon pokemon)
+        {
+            _context.Remove(pokemon);
+            return Save();
+        }
+
         public Pokemon GetPokemon(int id)
         {
             return _context.Pokemons.Where(p=> p.Id == id).FirstOrDefault();
@@ -39,6 +52,19 @@ namespace PokemonReviewWeb.Repository
         public bool PokemonExists(int PokemonId)
         {
             return _context.Pokemons.Any(p=> p.Id == PokemonId);
+        }
+
+        public bool Save()
+        {
+            //throw new NotImplementedException();
+            var pokemon = _context.SaveChanges();
+            return pokemon > 0 ? true : false;
+        }
+
+        public bool UpdatePokemon(Pokemon pokemon)
+        {
+            _context.Update(pokemon);
+            return Save();
         }
     }
 }

@@ -58,5 +58,66 @@ namespace PokemonReviewWeb.Controllers
             }
             return Ok(pokemonRating);
         }
+
+        [HttpPost]
+        public IActionResult CreatePokemon([FromBody] PokemonDTO pokemonCreated)
+        {
+            if (pokemonCreated == null)
+                return NotFound();
+
+            var pokemon = _pokemonRepository.GetPokemons()
+                .Where(p => p.Name.Trim().ToLower() == pokemonCreated.Name.Trim().ToLower())
+                .FirstOrDefault();
+
+            if(pokemon != null)
+            {
+                ModelState.AddModelError("", "Pokemon already exists");
+                return StatusCode(422, ModelState);
+            }
+
+            var pokemonMap = _mapper.Map<Pokemon>(pokemonCreated);
+            if(!_pokemonRepository.CreatePokemon(pokemonMap))
+            {
+                ModelState.AddModelError("", "Something went wrong while saving");
+                return StatusCode(500, ModelState);
+            }
+
+            return Ok("Successfully created");
+        }
+
+        [HttpPut("{pokemonId}")]
+        public IActionResult pokemonUpdate(int pokemonId,[FromBody]PokemonDTO updatePokemon)
+        {
+            if(updatePokemon == null || updatePokemon.Id!=pokemonId)
+                return BadRequest(ModelState);
+
+            if(!ModelState.IsValid)
+                return BadRequest();
+
+            var updatePokemonMap = _mapper.Map<Pokemon>(updatePokemon);
+            if(!_pokemonRepository.UpdatePokemon(updatePokemonMap))
+            {
+                ModelState.AddModelError("", "Something went wrong updating pokemon");
+                return StatusCode(500, ModelState);
+            }
+
+            return NoContent();
+        }
+
+
+        [HttpDelete("{pokemonId}")]
+        public IActionResult deletePokemon(int pokemonId)
+        {
+            if(!_pokemonRepository.PokemonExists(pokemonId))
+                return NotFound();
+            if(!ModelState.IsValid) 
+                return BadRequest();
+            
+            var pokemonDelete = _pokemonRepository.GetPokemon(pokemonId);
+            if(!_pokemonRepository.DeletePokemon(pokemonDelete))
+                ModelState.AddModelError("", "Something went wrong deleting pokemon");
+
+            return NoContent();
+        }
     }
 }
