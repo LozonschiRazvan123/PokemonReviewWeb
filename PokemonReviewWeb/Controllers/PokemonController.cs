@@ -13,11 +13,13 @@ namespace PokemonReviewWeb.Controllers
     {
         private readonly IPokemonRepository _pokemonRepository;
         private readonly IMapper _mapper;
+        private readonly IReviewerRepository _reviewerRepository;
 
-        public PokemonController(IPokemonRepository pokemonRepository, IMapper mapper)
+        public PokemonController(IPokemonRepository pokemonRepository, IMapper mapper, IReviewerRepository reviewerRepository)
         {
             _pokemonRepository = pokemonRepository;
             _mapper = mapper;
+            _reviewerRepository = reviewerRepository;
         }
 
         [HttpGet]
@@ -60,7 +62,7 @@ namespace PokemonReviewWeb.Controllers
         }
 
         [HttpPost]
-        public IActionResult CreatePokemon([FromBody] PokemonDTO pokemonCreated)
+        public IActionResult CreatePokemon([FromQuery] Guid ownerId, [FromQuery] int catId, [FromBody] PokemonDTO pokemonCreated)
         {
             if (pokemonCreated == null)
                 return NotFound();
@@ -76,7 +78,7 @@ namespace PokemonReviewWeb.Controllers
             }
 
             var pokemonMap = _mapper.Map<Pokemon>(pokemonCreated);
-            if(!_pokemonRepository.CreatePokemon(pokemonMap))
+            if(!_pokemonRepository.CreatePokemon(ownerId,catId,pokemonMap))
             {
                 ModelState.AddModelError("", "Something went wrong while saving");
                 return StatusCode(500, ModelState);

@@ -1,4 +1,5 @@
 ﻿using PokemonReviewWeb.Data;
+using PokemonReviewWeb.DTO;
 using PokemonReviewWeb.Interfaces;
 using PokemonReviewWeb.Models;
 
@@ -13,10 +14,29 @@ namespace PokemonReviewWeb.Repository
 
         }
 
-        public bool CreatePokemon(Pokemon pokemon)
+        public bool CreatePokemon(Guid ownerId, int categoryId, Pokemon pokemon)
         {
-            //throw new NotImplementedException();
+            var pokemonOwnerEntity = _context.Owners.Where(a => a.Id == ownerId).FirstOrDefault();
+            var category = _context.Categories.Where(a => a.Id == categoryId).FirstOrDefault();
+
+            var pokemonOwner = new PokemonOwner()
+            {
+                Owner = pokemonOwnerEntity,
+                Pokemon = pokemon,
+            };
+
+            _context.Add(pokemonOwner);
+
+            var pokemonCategory = new PokemonCategory()
+            {
+                Category = category,
+                Pokemon = pokemon,
+            };
+
+            _context.Add(pokemonCategory);
+
             _context.Add(pokemon);
+
             return Save();
         }
 
@@ -47,6 +67,12 @@ namespace PokemonReviewWeb.Repository
         public ICollection<Pokemon> GetPokemons()
         {
             return _context.Pokemons.OrderBy(p => p.Id).ToList();
+        }
+
+        public Pokemon GetPokemonTrimToUpper(PokemonDTO pokemonCreate)
+        {
+            return GetPokemons().Where(c => c.Name.Trim().ToUpper() == pokemonCreate.Name.TrimEnd().ToUpper())
+                .FirstOrDefault();
         }
 
         public bool PokemonExists(int PokemonId)
